@@ -32,6 +32,7 @@ Enabling users to switch between default and satellite map views.
 Implementing theme toggles and sidebar animations.
 
 🚀 Features
+
 ✔️ Search for Any City - Enter a location to retrieve real-time weather details.
 
 ✔️ Real-Time Weather Updates - Displays temperature, humidity, wind speed, UV index, and pressure.
