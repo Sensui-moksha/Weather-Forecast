@@ -53,6 +53,7 @@ Implementing theme toggles and sidebar animations.
 🎯 How to Use
 
 1.**Clone the repository:**
+
 ``bash
 git clone https://github.com/Sensui-moksha/weather-forecast.git
 cd weather-forecast-app``
