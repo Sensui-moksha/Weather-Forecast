@@ -2,6 +2,7 @@
 This is an interactive Weather Forecast Web Application that allows users to search for a city and retrieve real-time weather updates. The application features an interactive map with a satellite view option, automatic geolocation-based weather fetching, and a dark/light mode toggle for better user experience.
 
 📂 Project Structure
+
 🔹 index.html
 Contains the main structure of the web app, including search functionality, weather details, an interactive map, and UI elements.
 
