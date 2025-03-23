@@ -1,4 +1,5 @@
 🌦️ Weather Forecast Web App
+
 This is an interactive Weather Forecast Web Application that allows users to search for a city and retrieve real-time weather updates. The application features an interactive map with a satellite view option, automatic geolocation-based weather fetching, and a dark/light mode toggle for better user experience.
 
 📂 Project Structure
@@ -49,6 +50,7 @@ Implementing theme toggles and sidebar animations.
 
 
 🎯 How to Use
+
 1.Clone the repository: git clone https://github.com/Sensui-moksha/weather-forecast.git
                         cd weather-forecast-app
 2.Open index.html in your browser.
@@ -62,6 +64,7 @@ Implementing theme toggles and sidebar animations.
 6.Switch between dark mode and light mode as per your preference.
 
 🔧 Technologies Used
+
 HTML5 - Structure of the web app.
 
 CSS3 - Styling and responsive design.
@@ -73,14 +76,21 @@ Leaflet.js - Interactive mapping functionality.
 wttr.in API - Fetching real-time weather data.
 
 📌 Future Enhancements
+
 🔹 Add a 7-day weather forecast feature.
+
 🔹 Implement a graphical representation of weather trends.
+
 🔹 Integrate more weather APIs for enhanced accuracy.
+
 🔹 Allow users to save favorite locations for quick access.
 
+
 🎯 Live Demo
+
 🚀 Try it Live Here (Replace with the actual live link if hosted)
 
 📜 License
+
 This project is licensed under the MIT License – you are free to use, modify, and distribute it.
 
