@@ -31,13 +31,21 @@ Implementing theme toggles and sidebar animations.
 
 🚀 Features
 ✔️ Search for Any City - Enter a location to retrieve real-time weather details.
+
 ✔️ Real-Time Weather Updates - Displays temperature, humidity, wind speed, UV index, and pressure.
+
 ✔️ Location Detection - Automatically fetches weather based on the user's location.
+
 ✔️ Interactive Map - Uses Leaflet.js for a dynamic map with zoom controls.
+
 ✔️ Satellite & Default Map Views - Switch between standard and satellite views.
+
 ✔️ Dark/Light Mode - User-selectable themes for better visual comfort.
+
 ✔️ Error Handling - Displays messages if the city is not found or data is unavailable.
+
 ✔️ Responsive UI - Works smoothly on desktops, tablets, and mobile devices.
+
 
 🎯 How to Use
 1.Clone the repository: git clone https://github.com/Sensui-moksha/weather-forecast.git
