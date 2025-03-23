@@ -57,6 +57,7 @@ Implementing theme toggles and sidebar animations.
 ``bash
 git clone https://github.com/Sensui-moksha/weather-forecast.git
 cd weather-forecast-app``
+
 2.Open index.html in your browser.
 
 3.Enter a city name in the search box and click the search button.
