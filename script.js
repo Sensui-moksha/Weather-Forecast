@@ -1,191 +1,172 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const searchBox = document.querySelector(".search-box");
-    const searchBtn = document.querySelector(".search-btn");
-    const weatherContainer = document.querySelector(".weather");
-    const errorContainer = document.querySelector(".error");
-    const loadingIndicator = document.querySelector(".loading-indicator");
-    const themeSelect = document.getElementById("theme-select");
-    const satelliteBtn = document.getElementById("satellite-btn");
-    const menuBtn = document.getElementById("menu-btn");
-    const zoomInBtn = document.getElementById("zoom-in");
-    const zoomOutBtn = document.getElementById("zoom-out");
-    const sidebar = document.querySelector(".sidebar");
-    const body = document.body;
-    const zoomControls = document.querySelector(".zoom-controls");
+  const searchBox = document.querySelector(".search-box");
+  const searchBtn = document.querySelector(".search-btn");
+  const weatherContainer = document.querySelector(".weather");
+  const errorContainer = document.querySelector(".error");
+  const loadingIndicator = document.querySelector(".loading-indicator");
 
-    let map, marker, currentTileLayer;
-    let isSatelliteView = false;
+  let map, marker;
 
-    const initializeMap = async (lat = 20, lon = 0) => {
-        if (!map) {
-            map = L.map('map').setView([lat, lon], 2);
-            currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-        } else {
-            map.setView([lat, lon], 10);
-        }
+  const initializeMap = async (lat = 25, lon = 0, zoomLevel = 17) => {
+    if (!map) {
+      map = L.map("map", {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([lat, lon], zoomLevel);
 
-        const locationName = await getLocationName(lat, lon);
+      const satelliteLayer = L.tileLayer(
+        `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}`
+      ).addTo(map);
 
-        if (marker) {
-            marker.setLatLng([lat, lon]).setPopupContent(locationName).openPopup();
-        } else {
-            marker = L.marker([lat, lon]).addTo(map).bindPopup(locationName).openPopup();
-        }
-    };
+      map.createPane("labels");
+      map.getPane("labels").style.zIndex = 650;
+      map.getPane("labels").style.pointerEvents = "none";
 
-    const getLocationName = async (lat, lon) => {
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-            const data = await res.json();
-            return data.display_name || "Unknown Location";
-        } catch (error) {
-            console.error("Reverse Geocoding Failed:", error);
-            return "Unknown Location";
-        }
-    };
+      const labelsLayer = L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png`
+      ).addTo(map);
 
-    const fetchWeather = async (location) => {
-        weatherContainer.classList.add("loading");
-        errorContainer.style.display = "none";
-        loadingIndicator.style.display = "block";
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+    } else {
+      map.setView([lat, lon], zoomLevel);
+    }
 
-        try {
-            const res = await fetch(`https://wttr.in/${location}?format=j1`);
-            if (!res.ok) throw new Error("Failed to fetch weather");
-            const data = await res.json();
-            updateWeatherUI(data, location);
-        } catch (error) {
-            showError("Could not fetch weather data. Try again later.");
-        }
-    };
+    const locationName = await getLocationName(lat, lon);
 
-    const updateWeatherUI = (data, city) => {
-        const current = data.current_condition[0];
-        const { temp_C, humidity, windspeedKmph, uvIndex, pressure, localObsDateTime } = current;
-        const weatherDesc = current.weatherDesc[0].value;
-        const today = data.weather[0];
-        const lat = parseFloat(data.nearest_area[0].latitude);
-        const lon = parseFloat(data.nearest_area[0].longitude);
+    if (marker) {
+      marker.setLatLng([lat, lon]).setPopupContent(locationName).openPopup();
+    } else {
+      marker = L.marker([lat, lon])
+        .addTo(map)
+        .bindPopup(locationName)
+        .openPopup();
+    }
+  };
 
-        document.querySelector(".city").textContent = city;
-        document.querySelector(".temp").textContent = `${temp_C}°C`;
-        document.querySelector(".description").textContent = weatherDesc;
-        document.querySelector(".text-information").textContent = `Last Observation : ${localObsDateTime}`;
-        document.querySelector(".temp-hi").textContent = `H:  ${today.maxtempC}°C`;
-        document.querySelector(".temp-lo").textContent = `L:  ${today.mintempC}°C`;
-        document.querySelector(".pressure").textContent = `Pressure:  ${pressure}`;
-        document.querySelector(".humidity").textContent = `Humidity:  ${humidity}%`;
-        document.querySelector(".wind").textContent = `Wind:  ${windspeedKmph} km/h`;
-        document.querySelector(".uv-index").textContent = `UV Index:  ${uvIndex}`;
+  const getLocationName = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+      );
+      const data = await res.json();
+      return data.display_name || "Unknown Location";
+    } catch (error) {
+      console.error("Reverse Geocoding Failed:", error);
+      return "Unknown Location";
+    }
+  };
 
-        initializeMap(lat, lon);
+  const loadingScreen = document.querySelector(".loading-screen");
+  const showLoading = () => {
+    loadingScreen.classList.add("show");
+  };
 
-        loadingIndicator.style.display = "none";
-        weatherContainer.classList.remove("loading");
-    };
+  const hideLoading = () => {
+    loadingScreen.classList.remove("show");
+  };
 
-    const showError = (message) => {
-        errorContainer.style.display = "block";
-        errorContainer.textContent = message;
-        loadingIndicator.style.display = "none";
-        weatherContainer.classList.remove("loading");
-    };
+  const fetchWeather = async (location) => {
+    showLoading();
+    try {
+      const res = await fetch(`https://wttr.in/${location}?format=j1`);
+      if (!res.ok) throw new Error("Failed to fetch weather");
 
-    searchBtn.addEventListener("click", () => {
-        const city = searchBox.value.trim();
-        if (city) fetchWeather(city);
-    });
+      const data = await res.json();
+      updateWeatherUI(data, location);
+    } catch (error) {
+      showError("Could not fetch weather data. Try again later.");
+    } finally {
+      hideLoading();
+    }
+  };
 
-    searchBox.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            const city = searchBox.value.trim();
-            if (city) fetchWeather(city);
-        }
-    });
+  const updateWeatherUI = (data, city, lat, lon) => {
+    const current = data.current_condition[0];
+    const {
+      temp_C,
+      humidity,
+      windspeedKmph,
+      pressure,
+      localObsDateTime,
+      weatherCode,
+    } = current;
+    const weatherDesc = current.weatherDesc[0].value;
+    const today = data.weather[0];
 
-    const fetchUserLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    fetchWeather(`${latitude},${longitude}`);
-                    initializeMap(latitude, longitude);
-                },
-                () => showError("Location access denied. Please search manually."),
-                { enableHighAccuracy: true }
-            );
-        } else {
-            showError("Geolocation is not supported by your browser.");
-        }
-    };
-    fetchUserLocation();
+    document.querySelector(".city").textContent = city;
+    document.querySelector(".temp").textContent = `${temp_C}°C`;
+    document.querySelector(".description").textContent = weatherDesc;
+    document.querySelector(
+      ".text-information"
+    ).textContent = ` Last Observation : ${localObsDateTime}`;
+    document.querySelector(".temp-hi").textContent = ` H: ${today.maxtempC}°C`;
+    document.querySelector(".temp-lo").textContent = ` L: ${today.mintempC}°C`;
+    document.querySelector(
+      ".pressure"
+    ).textContent = ` Pressure: ${pressure} hPa`;
+    document.querySelector(".humidity").textContent = ` Humidity: ${humidity}%`;
+    document.querySelector(
+      ".wind"
+    ).textContent = ` Wind: ${windspeedKmph} km/h`;
+    document.querySelector(
+      ".weatherCode"
+    ).textContent = ` WeatherCode: ${weatherCode}`;
 
-    const applyTheme = (theme) => {
-        document.body.classList.remove("light-mode", "dark-mode");
-        if (theme === "light") {
-            document.body.classList.add("light-mode");
-        } else if (theme === "dark") {
-            document.body.classList.add("dark-mode");
-        }
-    };
+    initializeMap(lat, lon);
 
-    themeSelect.addEventListener("change", () => {
-        const selectedTheme = themeSelect.value;
-        if (selectedTheme === "system") {
-            const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-            applyTheme(systemPrefersDark ? "dark" : "light");
-        } else {
-            applyTheme(selectedTheme);
-        }
-    });
+    loadingIndicator.style.display = "none";
+    weatherContainer.classList.remove("loading");
+  };
 
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    themeSelect.value = "system";
-    applyTheme(systemPrefersDark ? "dark" : "light");
+  const showError = (message) => {
+    errorContainer.style.display = "block";
+    errorContainer.textContent = message;
+    loadingIndicator.style.display = "none";
+    weatherContainer.classList.remove("loading");
+  };
 
-    satelliteBtn.addEventListener("click", () => {
-        if (currentTileLayer) {
-            map.removeLayer(currentTileLayer);
-        }
+  searchBtn.addEventListener("click", () => {
+    const city = searchBox.value.trim();
+    if (city) fetchWeather(city);
+  });
 
-        if (!isSatelliteView) {
-            currentTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
-            });
-            satelliteBtn.textContent = "Default View";
-        } else {
-            currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            });
-            satelliteBtn.textContent = "Satellite View";
-        }
+  searchBox.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const city = searchBox.value.trim();
+      if (city) fetchWeather(city);
+    }
+  });
 
-        currentTileLayer.addTo(map);
-        isSatelliteView = !isSatelliteView;
-    });
+  const fetchUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          fetchWeatherByCoords(latitude, longitude, true);
+          initializeMap(latitude, longitude, 17);
+        },
+        () => showError("Location access denied. Please search manually."),
+        { enableHighAccuracy: true }
+      );
+    } else {
+      showError("Geolocation is not supported by your browser.");
+    }
+  };
 
-    menuBtn.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-        body.classList.toggle("sidebar-open");
+  const fetchWeatherByCoords = async (lat, lon, isPrecise = false) => {
+    try {
+      
+      const res = await fetch(`https://wttr.in/${lat},${lon}?format=j1`);
+      if (!res.ok) throw new Error("Location data error");
 
-        if (window.innerWidth <= 768) {
-            map.invalidateSize();
-        }
+      const data = await res.json();
+      const locationName = isPrecise ? "Your Precise Location" : `${lat}, ${lon}`;
+      updateWeatherUI(data, locationName, lat, lon); 
+    } catch (error) {
+      showError("Could not fetch location weather data.");
+    }
+  };
 
-        if (sidebar.classList.contains("active")) {
-            zoomControls.style.display = "none";
-        } else {
-            zoomControls.style.display = "flex";
-        }
-    });
-
-    zoomInBtn.addEventListener("click", () => {
-        if (map) map.zoomIn();
-    });
-
-    zoomOutBtn.addEventListener("click", () => {
-        if (map) map.zoomOut();
-    });
+  fetchUserLocation();
+  initializeMap();
 });
