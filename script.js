@@ -152,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchBox.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // Prevent default form submission behavior
       const city = searchBox.value.trim();
       if (city) {
         fetchWeather(city);
