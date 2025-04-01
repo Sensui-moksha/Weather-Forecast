@@ -43,13 +43,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  const sanitizeLocationName = (name) => {
+    // Remove non-English characters using a regular expression
+    return name.replace(/[^a-zA-Z0-9\s,.-]/g, "");
+  };
+
   const getLocationName = async (lat, lon) => {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
       );
       const data = await res.json();
-      return data.display_name || "Unknown Location";
+      const rawName = data.display_name || "Unknown Location";
+      return sanitizeLocationName(rawName);
     } catch (error) {
       console.error("Reverse Geocoding Failed:", error);
       return "Unknown Location";
@@ -68,11 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const fetchWeather = async (location) => {
     showLoading();
     try {
-      const res = await fetch(`https://wttr.in/${location}?format=j1`);
+      const geocodeRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          location
+        )}&format=json&limit=1`
+      );
+      const geocodeData = await geocodeRes.json();
+      if (!geocodeData.length) throw new Error("Location not found");
+
+      const { lat, lon } = geocodeData[0];
+      const res = await fetch(`https://wttr.in/${lat},${lon}?format=j1`);
       if (!res.ok) throw new Error("Failed to fetch weather");
 
       const data = await res.json();
-      updateWeatherUI(data, location);
+      updateWeatherUI(data, location, lat, lon);
     } catch (error) {
       showError("Could not fetch weather data. Try again later.");
     } finally {
@@ -81,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const updateWeatherUI = (data, city, lat, lon) => {
+    city = sanitizeLocationName(city);
     const current = data.current_condition[0];
     const {
       temp_C,
