@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const weatherContainer = document.querySelector(".weather");
   const errorContainer = document.querySelector(".error");
   const loadingIndicator = document.querySelector(".loading-indicator");
+  const suggestionsContainer = document.querySelector(".suggestions");
 
   let map, marker;
 
@@ -181,6 +182,47 @@ document.addEventListener("DOMContentLoaded", () => {
       showError("Could not fetch location weather data.");
     }
   };
+
+  const fetchSuggestions = async (query) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          query
+        )}&format=json&addressdetails=1&limit=5`
+      );
+      const data = await res.json();
+      displaySuggestions(data);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
+  };
+
+  const displaySuggestions = (locations) => {
+    suggestionsContainer.innerHTML = "";
+    if (locations.length === 0) {
+      suggestionsContainer.innerHTML = "<li>No results found</li>";
+      return;
+    }
+    locations.forEach((location) => {
+      const li = document.createElement("li");
+      li.textContent = `${location.display_name} (${location.lat}, ${location.lon})`;
+      li.addEventListener("click", () => {
+        searchBox.value = location.display_name;
+        suggestionsContainer.innerHTML = "";
+        fetchWeather(location.display_name);
+      });
+      suggestionsContainer.appendChild(li);
+    });
+  };
+
+  searchBox.addEventListener("input", (e) => {
+    const query = e.target.value.trim();
+    if (query.length > 2) {
+      fetchSuggestions(query);
+    } else {
+      suggestionsContainer.innerHTML = "";
+    }
+  });
 
   fetchUserLocation();
   initializeMap();
