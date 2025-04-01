@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) throw new Error("Location data error");
 
       const data = await res.json();
-      const locationName = isPrecise ? `Lat: ${lat}, Lon: ${lon}` : `${lat}, ${lon}`;
+      const locationName = isPrecise ? ` ${lat},  ${lon}` : `${lat}, ${lon}`;
       updateWeatherUI(data, locationName, lat, lon); 
     } catch (error) {
       showError("Could not fetch location weather data.");
