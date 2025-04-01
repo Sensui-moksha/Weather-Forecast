@@ -95,7 +95,7 @@ wttr.in API - Fetching real-time weather data.
 
 🎯 Live Demo
 
-🚀 Try it Live Here (Replace with the actual live link if hosted)
+🚀 Try it Live Here ((https://sensui-moksha.github.io/Weather-Forecast/))
 
 📜 License
 
