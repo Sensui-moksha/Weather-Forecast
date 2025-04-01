@@ -144,13 +144,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchBtn.addEventListener("click", () => {
     const city = searchBox.value.trim();
-    if (city) fetchWeather(city);
+    if (city) {
+      fetchWeather(city);
+      suggestionsContainer.innerHTML = ""; // Clear suggestions
+    }
   });
 
   searchBox.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       const city = searchBox.value.trim();
-      if (city) fetchWeather(city);
+      if (city) {
+        fetchWeather(city);
+        suggestionsContainer.innerHTML = ""; // Clear suggestions
+      }
     }
   });
 
