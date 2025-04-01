@@ -1,117 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Forecast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="shortcut icon" href="assets/cloudy.png" type="image/png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./script.js" defer></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather Forecast</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="shortcut icon" href="cloudy.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="./style.css">
-  <script src="./script.js" defer></script>
-</head>
+  <body>
+    <div class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
 
-<body>
-  <!-- Menu Button -->
-  <button id="menu-btn" class="menu-btn">
-    &#9776; <!-- Hamburger Icon -->
-  </button>
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Search for a city..."
+        required
+      />
+      <button class="search-btn">
+        <svg
+          stroke="currentColor"
+          fill="currentColor"
+          stroke-width="0"
+          viewBox="0 0 1024 1024"
+          height="1.5em"
+          width="1.5em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0 0 11.6 0l43.6-43.5a8.2 8.2 0 0 0 0-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"
+          ></path>
+        </svg>
+      </button>
+    </div>
 
-  <div class="search-container">
-    <input type="text" class="search-box" placeholder="Search for a city..." required>
-    <button class="search-btn">
-      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1.5em"
-        width="1.5em" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0 0 11.6 0l43.6-43.5a8.2 8.2 0 0 0 0-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z">
-        </path>
-      </svg>
-    </button>
-  </div>
-
-  <div class="theme-toggle">
-    <label for="theme-select">Theme:</label>
-    <select id="theme-select">
-      <option value="system">Default Mode</option>
-      <option value="light">Light Mode</option>
-      <option value="dark">Dark Mode</option>
-    </select>
-  </div>
-
-  <div class="map-toggle">
-    <button id="satellite-btn">Satellite View</button>
-  </div>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="weather">
-      <div class="current-weather">
-        <div class="weather-header">
-          <h2 class="city"></h2>
-          <p class="date"></p>
-        </div>
-        <div class="weather-info">
-          <h1 class="temp"></h1>
-          <p class="description"></p>
-          <div class="hi-lo">
-            <span class="temp-hi"></span>
-            <span class="temp-lo"></span>
+    <div class="sidebar">
+      <div class="weather">
+        <div class="current-weather">
+          <div class="weather-header">
+            <h2 class="city"></h2>
+            <p class="date"></p>
+          </div>
+          <div class="weather-info">
+            <h1 class="temp"></h1>
+            <p class="description"></p>
+            <div class="hi-lo">
+              <span class="temp-hi"></span>
+              <span class="temp-lo"></span>
+            </div>
+          </div>
+          <div class="weather-details">
+            <div class="detail">
+              <svg
+                class="detail-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zm0 18c-3.35 0-6-2.57-6-6.2 0-2.34 1.95-5.44 6-9.14 4.05 3.7 6 6.79 6 9.14 0 3.63-2.65 6.2-6 6.2zm-4.17-6c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z"
+                />
+              </svg>
+              <p class="humidity"></p>
+            </div>
+            <div class="detail">
+              <svg
+                class="detail-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M13 5.5C13 3.57 11.43 2 9.5 2 7.57 2 6 3.57 6 5.5h2c0-.83.67-1.5 1.5-1.5.83 0 1.5.67 1.5 1.5V9H6c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3v-6c0-1.66-1.34-3-3-3h-2V5.5zm-2 6.5h4v6H5v-6h6z"
+                />
+              </svg>
+              <p class="pressure"></p>
+            </div>
+            <div class="detail">
+              <svg
+                class="detail-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M14 5l-1-2H5v17h2v-7h5l1 2h7V5h-6zm4 10h-4l-1-2H7V5h3l1 2h7v8z"
+                />
+              </svg>
+              <p class="wind"></p>
+            </div>
+            <div class="detail">
+              <svg
+                class="detail-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"
+                />
+              </svg>
+              <p class="weatherCode"></p>
+            </div>
           </div>
         </div>
-        <div class="weather-details">
-          <div class="detail">
-            <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor"
-                d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zm0 18c-3.35 0-6-2.57-6-6.2 0-2.34 1.95-5.44 6-9.14 4.05 3.7 6 6.79 6 9.14 0 3.63-2.65 6.2-6 6.2zm-4.17-6c.37 0 .67.26.74.62.41 2.22 2.28 2.98 3.64 2.87.43-.02.79.32.79.75 0 .4-.32.73-.72.75-2.13.13-4.62-1.09-5.19-4.12-.08-.45.28-.87.74-.87z" />
-            </svg>
-            <p class="humidity"></p>
-          </div>
-          <div class="detail">
-            <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor"
-                d="M13 5.5C13 3.57 11.43 2 9.5 2 7.57 2 6 3.57 6 5.5h2c0-.83.67-1.5 1.5-1.5.83 0 1.5.67 1.5 1.5V9H6c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3v-6c0-1.66-1.34-3-3-3h-2V5.5zm-2 6.5h4v6H5v-6h6z" />
-            </svg>
-            <p class="pressure"></p>
-          </div>
-          <div class="detail">
-            <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor" d="M14 5l-1-2H5v17h2v-7h5l1 2h7V5h-6zm4 10h-4l-1-2H7V5h3l1 2h7v8z" />
-            </svg>
-            <p class="wind"></p>
-          </div>
-          <div class="detail">
-            <svg class="detail-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-              <path fill="currentColor"
-                d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z" />
-            </svg>
-            <p class="uv-index"></p>
-          </div>
+
+        <div class="Note">
+          <p class="text-information" style="font-weight: bolder"></p>
         </div>
       </div>
-
-      <div class="Note">
-        <p class="text-information" style="font-weight: bolder;"></p>
+      <div class="error">
+        <p></p>
       </div>
 
+      <div class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Getting weather data...</p>
+      </div>
     </div>
-    <div class="error">
-      <p>City not found. Please try another location.</p>
-    </div>
-
-    <div class="loading-indicator">
-      <div class="spinner"></div>
-      <p>Getting weather data...</p>
-    </div>
-  </div>
-  <div id="map"></div>
-  <div class="zoom-controls">
-    <button id="zoom-in" class="zoom-btn">+</button>
-    <button id="zoom-out" class="zoom-btn">-</button>
-  </div>
-</body>
-
+    <div id="map"></div>
+  </body>
 </html>
