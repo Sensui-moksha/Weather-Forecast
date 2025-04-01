@@ -155,12 +155,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const fetchWeatherByCoords = async (lat, lon, isPrecise = false) => {
     try {
-      
       const res = await fetch(`https://wttr.in/${lat},${lon}?format=j1`);
       if (!res.ok) throw new Error("Location data error");
 
       const data = await res.json();
-      const locationName = isPrecise ? "Your Precise Location" : `${lat}, ${lon}`;
+      const locationName = isPrecise ? `Lat: ${lat}, Lon: ${lon}` : `${lat}, ${lon}`;
       updateWeatherUI(data, locationName, lat, lon); 
     } catch (error) {
       showError("Could not fetch location weather data.");
