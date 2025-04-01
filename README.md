@@ -39,11 +39,13 @@ Implementing theme toggles and sidebar animations.
 
 ✔️ Location Detection - Automatically fetches weather based on the user's location.
 
+✔️ Manual location search - added manual location searching for better experience and suggestions
+
 ✔️ Interactive Map - Uses Leaflet.js for a dynamic map with zoom controls.
 
-✔️ Satellite & Default Map Views - Switch between standard and satellite views.
+✔️ Satellite & Default Map Views - merged together for better visuals
 
-✔️ Dark/Light Mode - User-selectable themes for better visual comfort.
+✔️ Dark/Light Mode - automatic themes for better visual comfort.
 
 ✔️ Error Handling - Displays messages if the city is not found or data is unavailable.
 
